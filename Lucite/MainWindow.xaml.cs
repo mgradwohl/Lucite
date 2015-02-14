@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace Lucite
 {
@@ -28,6 +29,7 @@ namespace Lucite
             InitializeComponent();
             employeedata.ItemsSource = employees;
 
+            // set default dates in the controls - would be cool to remember these from last time
             datestart.SelectedDate = datestart.DisplayDate = DateTime.Parse("7/23/14");
             dateend.SelectedDate = dateend.DisplayDate = DateTime.Parse("2/12/2015");
         }
@@ -37,31 +39,36 @@ namespace Lucite
             Go();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //Go();
-        }
-
         public void Go()
         {
-            employeedata.Columns[1].Visibility = Visibility.Hidden;
-            employeedata.Columns[3].Visibility = Visibility.Hidden;
-            employeedata.Columns[4].Visibility = Visibility.Hidden;
-            employeedata.Columns[5].Visibility = Visibility.Hidden;
-            employeedata.Columns[6].Visibility = Visibility.Hidden;
-            employeedata.Columns[7].Visibility = Visibility.Hidden;
-            employeedata.Columns[9].Visibility = Visibility.Hidden;
-
             string file = BrowseFile();
             headtraxcsv.Text = file;
 
             ParseFile(file);
+            UpdateView();
+        }
 
+        public void UpdateView()
+        {
             AwardDates();
-
-            //NextAwardDates();
-            //Awards();
             AwardText();
+
+            // sort after data flows in
+            employeedata.Items.SortDescriptions.Clear();
+
+            employeedata.Items.SortDescriptions.Add(new SortDescription("Award", ListSortDirection.Ascending));
+            employeedata.Items.SortDescriptions.Add(new SortDescription("StartDateTime", ListSortDirection.Ascending));
+
+            foreach (var c in employeedata.Columns)
+            {
+                c.SortDirection = null;
+            }
+            employeedata.Columns[9].SortDirection = ListSortDirection.Ascending;
+            employeedata.Columns[1].SortDirection = ListSortDirection.Ascending;
+
+            employeedata.Items.Refresh();
+
+            // TODO scroll the top of the list into view
         }
 
         public void AwardDates()
@@ -93,6 +100,10 @@ namespace Lucite
                 {
                     e.AwardFlag = true;
                     e.Award = award.Year - e.StartDateTime.Year;
+                }
+                else
+                {
+                    e.AwardFlag = false;
                 }
 
                 e.AwardDateTime = award;
@@ -254,97 +265,57 @@ namespace Lucite
 
         private void datestart_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Go();
+            if (datestart.IsVisible)
+            {
+                UpdateView();
+            }
         }
 
         private void dateend_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Go();
+            if (dateend.IsVisible)
+            {
+                UpdateView();
+            }
         }
 
         private void employeedata_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            if (e.Column.DisplayIndex == 8 )
+            if (e.Column.DisplayIndex == 8)
             {
-                //e.Column = employeedata.Columns[9];
                 e.Column.SortMemberPath = "Award";
+            }
+
+            if (e.Column.DisplayIndex == 2)
+            {
+                e.Column.SortMemberPath = "StartDateTime";
             }
             e.Handled = false;
         }
+
+        private void employeedata_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            // let these columns autogenerate, but have them hidden. We can use them for sorting
+            if (( e.PropertyName == "StartDateTime") ||
+                (e.PropertyName == "AwardDateTime") ||
+                //(e.PropertyName == "AwardDate") ||
+                (e.PropertyName == "NextAward") ||
+                (e.PropertyName == "NextAwardDateTime") ||
+                (e.PropertyName == "AwardFlag") ||
+                (e.PropertyName == "Award"))
+            {
+                e.Column.Visibility = Visibility.Hidden;
+            }
+
+            if ( e.PropertyName == "AwardDate")
+            {
+                e.Column.Header = "Award Date";
+            }
+
+            if (e.PropertyName == "StartDate")
+            {
+                e.Column.Header = "Start Date";
+            }
+        }
     }
 }
-
-//public void Awards()
-//{
-//    DateTime start = datestart.DisplayDate;
-//    DateTime end = dateend.DisplayDate;
-
-//    // eliminate first by looking at the year
-//    List<int> years = new List<int>();
-//    int[] ai = { 0, 1, 5, 10, 15, 20, 25, 30, 40 };
-//    List<int> ay = new List<int>(ai);
-
-//    for (int i=start.Year; i<=end.Year; i++)
-//    {
-//        // two special cases - check to see if they are a new hire or 1 year anniversary
-//        years.Add(i);
-//        years.Add(i-1);
-//        // now add anniversaries for 5, 10, 15, 20, 25, and 30
-//        for (int j=1; j<=6;j++)
-//        {
-//            years.Add(i-(j*5));
-//        }
-//    }
-//    // if the employee start year is not in the List, then they aren't awarded
-//    years.Sort();
-
-//    foreach (Employee e in employees)
-//    {
-//        if (years.Contains(e.StartDateTime.Year))
-//        {
-//            e.AwardFlag = true;
-//        }
-//        // if it's not an anniversary we care about, eliminate it
-//        if (!ay.Contains(end.Year - e.StartDateTime.Year))
-//        {
-//            e.AwardFlag = false;
-//        }
-//    }
-
-//    // now we only need to look at the employees that have true for AwardFlag
-//    // and see if there month is within bounds
-//    foreach (Employee e in employees)
-//    {
-//        if (e.AwardFlag == true)
-//        {
-//            if (start.Year == end.Year)
-//            {
-//                if ( (start.Month <= e.AwardDateTime.Month) && (e.AwardDateTime.Month <= end.Month) )
-//                {
-//                    //null
-//                }
-//                else
-//                {
-//                    e.AwardFlag = false;
-//                }
-
-//            }
-//            // the start year and end year are different
-//            else
-//            {
-//                if ( (end.Year - start.Year) == 1 )
-//                {
-//                    if ( (start.Month <= e.AwardDateTime.Month) || (e.AwardDateTime.Month <= end.Month) )
-//                    {
-//                        e.AwardFlag = true;
-//                    }
-//                    else
-//                    {
-//                        e.AwardFlag = false;
-//                    }
-//                }
-//            }
-
-//        }
-//    }
-//}

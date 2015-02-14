@@ -2,20 +2,20 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Lucite" x:Class="Lucite.MainWindow"
-        Title="Lucite" Height="535" Width="766">
+        Title="Lucite" Height="773" Width="541">
     <Grid>
         <DatePicker x:Name="datestart" HorizontalAlignment="Left" Margin="128,6,0,0" VerticalAlignment="Top" Height="24" Width="120" SelectedDateChanged="datestart_SelectedDateChanged"/>
         <DatePicker x:Name="dateend" Margin="398,6,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120" SelectedDateChanged="dateend_SelectedDateChanged"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,285" TextWrapping="Wrap" Text="Date of last all hands" Width="113"/>
         <TextBlock HorizontalAlignment="Left" Margin="278,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24"><Run Text="Date of next all hands"/><LineBreak/><Run/></TextBlock>
-        <DataGrid x:Name="employeedata" Margin="10,67,10,10" ItemsSource="{Binding /, BindsDirectlyToSource=True, IsAsync=True}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" ClipboardCopyMode="IncludeHeader" IsReadOnly="True" AreRowDetailsFrozen="True" HeadersVisibility="Column" Sorting="employeedata_Sorting" >
+        <DataGrid x:Name="employeedata" Margin="10,67,10,10" ItemsSource="{Binding /, BindsDirectlyToSource=True, IsAsync=True}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" ClipboardCopyMode="IncludeHeader" IsReadOnly="True" AreRowDetailsFrozen="True" HeadersVisibility="Column" Sorting="employeedata_Sorting" AutoGeneratingColumn="employeedata_AutoGeneratingColumn" >
             <DataGrid.DataContext>
                 <local:Employees/>
             </DataGrid.DataContext>
         </DataGrid>
         <TextBlock HorizontalAlignment="Left" Margin="10,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="21" Width="214"><Run Text="Headtrax CSV with Service Award Date"/><LineBreak/><Run/></TextBlock>
         <Button Content="..." Margin="0,40,10,0" VerticalAlignment="Top" Click="Button_Click" HorizontalAlignment="Right" Width="24"/>
-        <TextBox x:Name="headtraxcsv" Height="23" Margin="229,39,39,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" TextChanged="TextBox_TextChanged"/>
+        <TextBox x:Name="headtraxcsv" Height="23" Margin="224,39,39,0" TextWrapping="Wrap" VerticalAlignment="Top" AllowDrop="False" IsReadOnly="True"/>
 
     </Grid>
 </Window>
