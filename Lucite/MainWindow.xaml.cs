@@ -104,6 +104,7 @@ namespace Lucite
                 else
                 {
                     e.AwardFlag = false;
+                    e.Award = -1;
                 }
 
                 e.AwardDateTime = award;
@@ -143,9 +144,14 @@ namespace Lucite
                             break;
                     }
                 }
+                else
+                {
+                    e.Anniversary = "";
+                }
             }
         }
 
+        // TODO deadcode ?
         public void NextAwardDates()
         {
             DateTime end = dateend.SelectedDate.Value;
@@ -189,7 +195,8 @@ namespace Lucite
             {
                 StreamReader reader = new StreamReader(file);
 
-                // make sure there is a Name column "Full Name" and a award date column "Service Award Date"
+                // make sure there is a Name column "Full Name"
+                // and a award date column "Service Award Date"
                 // but don't care about the order
                 string header = reader.ReadLine();
                 string[] hv = header.Split(',');
@@ -214,7 +221,7 @@ namespace Lucite
 
                 if ((nc == -1) || (nc == -1))
                 {
-                    // error columns not found
+                    // TODO error columns not found
                 }
 
                 // skip the extra field because of the , in the name
@@ -269,6 +276,7 @@ namespace Lucite
             {
                 UpdateView();
             }
+            e.Handled = false;
         }
 
         private void dateend_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
@@ -277,6 +285,7 @@ namespace Lucite
             {
                 UpdateView();
             }
+            e.Handled = false;
         }
 
         private void employeedata_Sorting(object sender, DataGridSortingEventArgs e)
@@ -290,6 +299,7 @@ namespace Lucite
             {
                 e.Column.SortMemberPath = "StartDateTime";
             }
+
             e.Handled = false;
         }
 
